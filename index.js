@@ -1,5 +1,7 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
+const Person = require("./models/person");
 const cors = require("cors");
 app.use(cors());
 app.use(express.json());
@@ -32,7 +34,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find({}).then((result) => {
+    res.json(result);
+  });
 });
 
 app.get("/api/info", (req, res) => {
@@ -44,12 +48,9 @@ app.get("/api/info", (req, res) => {
 
 app.get("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
+  Person.findById(id).then((person) => {
     res.json(person);
-  } else {
-    res.status(404).end();
-  }
+  });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
@@ -72,17 +73,20 @@ app.post("/api/persons", (req, res) => {
       error: "name must be unique",
     });
   }
-  const person = {
-    id: Math.floor(Math.random() * 1000),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
+
+  person.save().then((savedPerson) => {
+    res.json(savedPerson);
+  });
 
   persons = persons.concat(person);
 
   res.json(person);
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT);
 console.log(`Server running on port ${PORT}`);
