@@ -29,7 +29,7 @@ const errorHandler = (error, request, response, next) => {
 };
 
 app.get("/", (req, res) => {
-  res.send(`<h1>Hello World!</h1>`);
+  res.send("<h1>Hello World!</h1>");
 });
 
 app.get("/api/persons", (req, res) => {
@@ -61,9 +61,9 @@ app.get("/api/persons/:id", (req, res) => {
     });
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
-    .then((result) => {
+    .then(() => {
       res.status(204).end();
     })
     .catch((error) => {
